@@ -1,5 +1,5 @@
 from discord.ext import tasks
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from firebase_client import get_latest_usdt_to_bob, get_historical_usdt_to_bob
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ async def monitor_exchange_rate():
     now = datetime.now(tz)
     target_time = now.replace(hour=9, minute=0, second=0, microsecond=0)
     if now > target_time:
-        target_time = target_time.replace(day=now.day + 1)
+        target_time = target_time + timedelta(days=1)
     await discord.utils.sleep_until(target_time)
 
     price = get_latest_usdt_to_bob()
