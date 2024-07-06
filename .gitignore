@@ -1,3 +1,4 @@
 example.ipynb
 __pycache__/
 .venv/
+.env
