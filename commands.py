@@ -17,7 +17,7 @@ class SubscriptionView(discord.ui.View):
             for channel in channels
         ]
         select = discord.ui.Select(
-            placeholder="Selecciona un canal...",
+            placeholder="Selecciona un canal",
             min_values=1,
             max_values=1,
             options=options
