@@ -2,7 +2,7 @@ import datetime
 import asyncio
 from discord.ext import tasks
 from firebase_client import get_latest_usdt_to_bob
-from commands import get_bot, get_subscribed_channels
+from bot_setup import get_bot, get_subscribed_channels
 
 bot = get_bot()
 
@@ -25,4 +25,5 @@ async def before():
         target_time = target_time + datetime.timedelta(days=1)
     await asyncio.sleep((target_time - now).total_seconds())
 
-monitor_exchange_rate.start()
+if not monitor_exchange_rate.is_running():
+    monitor_exchange_rate.start()
