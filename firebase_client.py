@@ -25,31 +25,34 @@ def get_latest_usdt_to_bob():
             return price
     return None
 
-def get_historical_usdt_to_bob(temporality='hourly'):
-    collection_name = 'binance_prices' if temporality == 'hourly' else 'binance_prices_end_of_the_day'
+def get_historical_usdt_to_bob(temporality='daily'):
+    if temporality == 'daily':
+        collection_name = 'binance_prices_end_of_the_day'
+    else:
+        collection_name = 'binance_prices'
+    
     url = f"https://firestore.googleapis.com/v1/projects/{FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery?key={FIREBASE_API_KEY}"
     
     query = {
         "structuredQuery": {
             "from": [{"collectionId": collection_name}],
             "orderBy": [{"field": {"fieldPath": "timestamp"}, "direction": "DESCENDING"}],
-            "limit": 10
+            "limit": 10  
         }
     }
 
     response = requests.post(url, json=query)
 
-    historical_data = []
     if response.status_code == 200:
         results = response.json()
-        for result in results:
-            if 'document' in result:
-                doc = result['document']
-                fields = doc['fields']
-                timestamp = fields['timestamp']['timestampValue']
-                average_price = fields['averagePrice']['doubleValue']
-                historical_data.append({
-                    'timestamp': timestamp,
-                    'averagePrice': average_price
-                })
-    return historical_data
+        if results:
+            historical_data = []
+            for result in results:
+                if 'document' in result:
+                    doc = result['document']
+                    fields = doc['fields']
+                    timestamp = fields['timestamp']['timestampValue']
+                    price = fields['averagePrice']['doubleValue']
+                    historical_data.append({'timestamp': timestamp, 'averagePrice': price})
+            return historical_data
+    return []

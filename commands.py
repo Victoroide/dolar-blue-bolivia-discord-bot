@@ -9,7 +9,7 @@ import io
 
 bot = get_bot()
 subscribed_channels = get_subscribed_channels()
-user_timezones = {}  
+user_timezones = {} 
 
 common_timezones = [
     'UTC', 'US/Pacific', 'US/Eastern', 'Europe/London', 'Europe/Berlin',
@@ -27,7 +27,7 @@ class SubscriptionView(discord.ui.View):
             for channel in channels
         ]
         self.select = discord.ui.Select(
-            placeholder="Selecciona un canal",
+            placeholder="Selecciona un canal...",
             min_values=1,
             max_values=1,
             options=options
@@ -42,7 +42,7 @@ class SubscriptionView(discord.ui.View):
             f"Canal {interaction.guild.get_channel(channel_id).mention} suscrito para recibir actualizaciones del precio del dólar.", 
             ephemeral=True
         )
-        await interaction.message.delete()  
+        await interaction.message.delete() 
 
 class TimezoneSelectView(discord.ui.View):
     def __init__(self):
@@ -114,10 +114,10 @@ class HistoricalButton(discord.ui.Button):
             timestamp = datetime.fromisoformat(entry['timestamp'].replace('Z', '+00:00')).astimezone(tz)
             if temporality == 'hourly':
                 timestamp_str = timestamp.strftime('%H:%M')
-                message += f"Hora: {timestamp_str} - Precio: {price:.3f} BOB\n"
+                message += f"Hora: {timestamp_str} - Precio: {entry['averagePrice']:.3f} BOB\n"
             else:
                 timestamp_str = timestamp.strftime('%d %b')
-                message += f"Fecha: {timestamp_str} - Precio: {price:.3f} BOB\n"
+                message += f"Fecha: {timestamp_str} - Precio: {entry['averagePrice']:.3f} BOB\n"
 
         await interaction.response.send_message(message, file=file, ephemeral=True)
 
