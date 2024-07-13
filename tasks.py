@@ -16,7 +16,7 @@ default_timezone = 'America/La_Paz'
 async def monitor_exchange_rate():
     tz = pytz.timezone(default_timezone)
     now = datetime.now(tz)
-    target_time = now.replace(hour=9, minute=0, second=0, microsecond=0)  
+    target_time = now.replace(hour=14, minute=18, second=0, microsecond=0)  
     if now > target_time:
         target_time = target_time + timedelta(days=1)
     await discord.utils.sleep_until(target_time)
