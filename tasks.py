@@ -3,18 +3,20 @@ from datetime import datetime, timedelta
 import pytz
 from firebase_client import get_latest_usdt_to_bob, get_historical_usdt_to_bob
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import io
-import discord
+import discord, commands
 from bot_setup import get_bot, get_subscribed_channels
 
 bot = get_bot()
 subscribed_channels = get_subscribed_channels()
+default_timezone = 'America/La_Paz'
 
 @tasks.loop(hours=24)
 async def monitor_exchange_rate():
-    tz = pytz.timezone('America/La_Paz')
+    tz = pytz.timezone(default_timezone)
     now = datetime.now(tz)
-    target_time = now.replace(hour=9, minute=0, second=0, microsecond=0)
+    target_time = now.replace(hour=9, minute=0, second=0, microsecond=0)  
     if now > target_time:
         target_time = target_time + timedelta(days=1)
     await discord.utils.sleep_until(target_time)
@@ -32,7 +34,11 @@ async def monitor_exchange_rate():
         fig, ax = plt.subplots()
         ax.plot(timestamps, prices, marker='o')
         ax.set(xlabel='Fecha', ylabel='Precio (BOB)', title='Historial por Día')
-        ax.set_xticks([]) 
+        
+        ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        fig.autofmt_xdate()
+
         ax.grid()
 
         buf = io.BytesIO()

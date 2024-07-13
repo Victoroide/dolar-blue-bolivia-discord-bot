@@ -1,15 +1,17 @@
 import discord
 from discord.ext import commands
 from firebase_client import get_latest_usdt_to_bob, get_historical_usdt_to_bob
-from bot_setup import get_bot, get_subscribed_channels
+from bot_setup import get_bot, get_subscribed_channels, save_subscribed_channels
 from datetime import datetime
 import pytz
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import io
 
 bot = get_bot()
 subscribed_channels = get_subscribed_channels()
 user_timezones = {} 
+default_timezone = 'America/La_Paz'
 
 common_timezones = [
     'UTC', 'US/Pacific', 'US/Eastern', 'Europe/London', 'Europe/Berlin',
@@ -38,6 +40,7 @@ class SubscriptionView(discord.ui.View):
     async def select_callback(self, interaction):
         channel_id = int(self.select.values[0])
         subscribed_channels[interaction.guild.id] = channel_id
+        save_subscribed_channels(subscribed_channels)
         await interaction.response.send_message(
             f"Canal {interaction.guild.get_channel(channel_id).mention} suscrito para recibir actualizaciones del precio del dólar.", 
             ephemeral=True
@@ -79,8 +82,9 @@ class HistoricalButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction):
         temporality = self.custom_id
         historical_data = get_historical_usdt_to_bob(temporality=temporality)
-        user_timezone = user_timezones.get(interaction.user.id, 'UTC')
+        user_timezone = user_timezones.get(interaction.user.id, default_timezone)
         await self.display_historical_data(interaction, historical_data, temporality, user_timezone)
+        await interaction.message.delete()  
 
     async def display_historical_data(self, interaction, data, temporality, timezone):
         tz = pytz.timezone(timezone)
@@ -98,7 +102,13 @@ class HistoricalButton(discord.ui.Button):
 
         ax.set(xlabel='Hora' if temporality == 'hourly' else 'Fecha', ylabel='Precio (BOB)', title=f'Historial por {"Hora" if temporality == "hourly" else "Día"}')
 
-        ax.set_xticks([])
+        if temporality == 'hourly':
+            ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M', tz=tz))
+        else:
+            ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d', tz=tz))
+        fig.autofmt_xdate() 
 
         ax.grid()
 
@@ -119,19 +129,12 @@ class HistoricalButton(discord.ui.Button):
                 timestamp_str = timestamp.strftime('%d %b')
                 message += f"Fecha: {timestamp_str} - Precio: {entry['averagePrice']:.3f} BOB\n"
 
-        await interaction.response.send_message(message, file=file, ephemeral=True)
+        await interaction.channel.send(message, file=file) 
 
 @bot.command(name='set_timezone')
 async def set_timezone(ctx):
     view = TimezoneSelectView()
     await ctx.send("Selecciona tu zona horaria:", view=view)
-
-@bot.event
-async def on_ready():
-    print(f'Bot {bot.user} is ready')
-    from tasks import monitor_exchange_rate
-    if not monitor_exchange_rate.is_running():
-        monitor_exchange_rate.start()
 
 @bot.command(name='precio')
 async def fetch_price(ctx):
@@ -143,6 +146,13 @@ async def fetch_price(ctx):
 
 @bot.command(name='suscribir')
 async def subscribe_channel(ctx):
+    if ctx.guild.id in subscribed_channels:
+        channel_id = subscribed_channels[ctx.guild.id]
+        existing_channel = ctx.guild.get_channel(channel_id)
+        if existing_channel:
+            await ctx.send(f"El canal {existing_channel.mention} ya está suscrito para recibir actualizaciones del precio del dólar.")
+            return
+
     channels = [channel for channel in ctx.guild.text_channels]
     view = SubscriptionView(channels)
     await ctx.send("Selecciona el canal donde quieres recibir las actualizaciones del precio del dólar:", view=view)
@@ -151,9 +161,11 @@ async def subscribe_channel(ctx):
 async def unsubscribe_channel(ctx):
     if ctx.guild.id in subscribed_channels and subscribed_channels[ctx.guild.id] == ctx.channel.id:
         del subscribed_channels[ctx.guild.id]
+        save_subscribed_channels(subscribed_channels) 
         await ctx.send(f"El canal {ctx.channel.mention} ha sido desuscrito de las actualizaciones del precio del dólar.")
     else:
         await ctx.send(f"El canal {ctx.channel.mention} no está suscrito a las actualizaciones del precio del dólar.")
+
 
 @bot.command(name='historial')
 async def historial_command(ctx):

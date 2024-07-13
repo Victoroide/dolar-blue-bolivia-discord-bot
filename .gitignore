@@ -2,3 +2,4 @@ example.ipynb
 __pycache__/
 .venv/
 .env
+subscribed_channels.json
