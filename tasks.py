@@ -17,7 +17,7 @@ async def monitor_exchange_rate():
     print("Ejecutando tarea programada para monitorear el tipo de cambio.")
     tz = pytz.timezone(default_timezone)
     now = datetime.now(tz)
-    target_time = now.replace(hour=14, minute=26, second=30, microsecond=0)  
+    target_time = now.replace(hour=14, minute=30, second=30, microsecond=0)  
     if now > target_time:
         target_time = target_time + timedelta(days=1)
     await discord.utils.sleep_until(target_time)
@@ -47,17 +47,18 @@ async def monitor_exchange_rate():
         buf.seek(0)
         plt.close(fig)
 
-        file = discord.File(buf, filename="historial.png")
-
         for guild_id, channel_id in subscribed_channels.items():
             channel = bot.get_channel(channel_id)
             if channel:
+                # Crear una copia del buffer para cada envío
+                buf_copy = io.BytesIO(buf.getvalue())
+                file = discord.File(buf_copy, filename="historial.png")
                 print(f"Enviando mensaje a canal {channel.name} (ID: {channel_id}) en servidor {channel.guild.name} (ID: {guild_id})")
                 await channel.send(
                     f"El precio actual de USDT a BOB es: {price:.3f} BOB",
                     file=file
                 )
-        buf.close() 
+        buf.close()  # Cerrar el buffer original después de enviar el archivo a todos los canales
     else:
         print('No se pudo obtener el precio actual.')
 
