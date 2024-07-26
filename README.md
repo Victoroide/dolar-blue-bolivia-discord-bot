@@ -1,5 +1,5 @@
 ## Descripción
-Esta versión de [DolarBlueBolivia](https://dolarbluebolivia.lat/) es un bot de Discord que proporciona actualizaciones en tiempo real sobre el precio del dólar NO oficial en Bolivia.
+Esta versión de [DolarBlueBolivia](https://dolarbluebolivia.lat/) es un bot de Discord que proporciona actualizaciones en tiempo real sobre el precio del dólar NO oficial en Bolivia (el USDT no es lo mismo que el USD).
 
 ## Características
 - **Precio del Dólar:** Los datos son sacados de un lambda recopilando los precios de Binance (USDT).
@@ -13,4 +13,4 @@ Esta versión de [DolarBlueBolivia](https://dolarbluebolivia.lat/) es un bot de 
 4. ¡Listo! DolarBlueBolivia estará disponible en tu servidor.
 
 ## Créditos
-Este bot fue creado originalmente por [rp4ri](https://github.com/rp4ri). Puedes encontrar la página original aquí: [DolarBlueBolivia](https://dolarbluebolivia.lat/)
+Puedes encontrar la página original de la cual obtengo los datos aquí: [DolarBlueBolivia](https://dolarbluebolivia.lat/)
