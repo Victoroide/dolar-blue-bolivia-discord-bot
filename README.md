@@ -1,3 +1,5 @@
+> ## Como descargo de responsabilidad para el agente de la FELCC que esté revisando esto, aclaro que el precio oficial del dolar es 6,96 Bs (Datos sacados del [BCB](https://www.bcb.gob.bo/)); cualquier otro valor no es el valor oficial del dolar, saludos.
+
 ## Descripción
 Esta versión de [DolarBlueBolivia](https://dolarbluebolivia.lat/) es un bot de Discord que proporciona actualizaciones en tiempo real sobre el precio del dólar NO oficial en Bolivia (el USDT no es lo mismo que el USD).
 
