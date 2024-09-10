@@ -33,7 +33,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }} 
         script: |
           # Navegar a la carpeta del proyecto
-          cd dolarblue-discord-bot
+          cd dolar-blue-bolivia-discord-bot
 
           # Obtener la última versión del código desde la rama 'main'
           git fetch origin main
