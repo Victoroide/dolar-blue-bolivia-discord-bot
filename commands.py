@@ -176,10 +176,10 @@ async def historial_command(ctx):
 async def help_command(ctx):
     help_text = """
     **Comandos Disponibles:**
-    `!dbb precio` - Muestra el precio actual de USDT a BOB.
-    `!dbb suscribir` - Suscribe un canal para recibir actualizaciones diarias del precio del dólar.
-    `!dbb desuscribir` - Desuscribe el canal actual de las actualizaciones del precio del dólar.
-    `!dbb historial` - Muestra el historial de cambios del tipo de cambio del dólar. Puedes seleccionar entre ver por hora o por día.
-    `!dbb set_timezone` - Establece tu zona horaria para mostrar los tiempos correctamente mediante una lista desplegable.
+    `/dbb precio` - Muestra el precio actual de USDT a BOB.
+    `/dbb suscribir` - Suscribe un canal para recibir actualizaciones diarias del precio del dólar.
+    `/dbb desuscribir` - Desuscribe el canal actual de las actualizaciones del precio del dólar.
+    `/dbb historial` - Muestra el historial de cambios del tipo de cambio del dólar. Puedes seleccionar entre ver por hora o por día.
+    `/dbb set_timezone` - Establece tu zona horaria para mostrar los tiempos correctamente mediante una lista desplegable.
     """
     await ctx.send(help_text)
