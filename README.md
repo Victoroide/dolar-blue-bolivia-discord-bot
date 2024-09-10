@@ -6,7 +6,7 @@ Esta versión de [DolarBlueBolivia](https://dolarbluebolivia.lat/) es un bot de 
 ## Características
 - **Precio del Dólar:** Los datos son sacados de un lambda recopilando los precios de Binance (USDT).
 - **Suscripción a Canales:** Los usuarios pueden suscribirse a canales específicos para recibir actualizaciones diarias a las 09:00 A.M.
-- **Comandos Personalizados:** DolarBlueBolivia responde a comandos como `!dbb precio`, `!dbb suscribir` y `!dbb desuscribir`, para más información usa `!dbb help`.
+- **Comandos Personalizados:** DolarBlueBolivia responde a comandos como `/dbb precio`, `/dbb suscribir` y `/dbb desuscribir`, para más información usa `/dbb help`.
 
 ## Instalación
 1. Haz clic en el enlace de invitación: [Invitar a DolarBlueBolivia](https://discord.com/oauth2/authorize?client_id=1258970302663360543)
