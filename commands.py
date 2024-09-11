@@ -132,49 +132,55 @@ class HistoricalButton(discord.ui.Button):
 
         await interaction.channel.send(message, file=file) 
 
-# ---- Slash Commands (App Commands) ----
+@bot.command(name='set_timezone')
+async def set_timezone(ctx):
+    view = TimezoneSelectView()
+    await ctx.send("Selecciona tu zona horaria:", view=view)
 
-# Slash Command: Precio
-@bot.tree.command(name="precio", description="Obtén el precio actual de USDT a BOB")
-async def slash_precio(interaction: discord.Interaction):
+@bot.command(name='precio')
+async def fetch_price(ctx):
     price = get_latest_usdt_to_bob()
     if price:
-        await interaction.response.send_message(f'El precio actual de USDT a BOB es: {price:.3f} BOB')
+        await ctx.send(f'El precio actual de USDT a BOB es: {price:.3f} BOB')
     else:
-        await interaction.response.send_message('No se pudo obtener el precio actual.')
+        await ctx.send('No se pudo obtener el precio actual.')
 
-# Slash Command: Suscribir
-@bot.tree.command(name="suscribir", description="Suscribe un canal para actualizaciones del precio del dólar")
-async def slash_suscribir(interaction: discord.Interaction):
-    if interaction.guild.id in subscribed_channels:
-        channel_id = subscribed_channels[interaction.guild.id]
-        existing_channel = interaction.guild.get_channel(channel_id)
+@bot.command(name='suscribir')
+async def subscribe_channel(ctx):
+    if ctx.guild.id in subscribed_channels:
+        channel_id = subscribed_channels[ctx.guild.id]
+        existing_channel = ctx.guild.get_channel(channel_id)
         if existing_channel:
-            await interaction.response.send_message(f"El canal {existing_channel.mention} ya está suscrito.")
+            await ctx.send(f"El canal {existing_channel.mention} ya está suscrito para recibir actualizaciones del precio del dólar.")
             return
 
-    channels = [channel for channel in interaction.guild.text_channels]
+    channels = [channel for channel in ctx.guild.text_channels]
     view = SubscriptionView(channels)
-    await interaction.response.send_message("Selecciona el canal para recibir actualizaciones:", view=view)
+    await ctx.send("Selecciona el canal donde quieres recibir las actualizaciones del precio del dólar:", view=view)
 
-# Slash Command: Historial
-@bot.tree.command(name="historial", description="Muestra el historial de cambios del tipo de cambio del dólar")
-async def slash_historial(interaction: discord.Interaction):
-    view = HistoricalView()
-    await interaction.response.send_message("Selecciona la temporalidad del historial:", view=view)
-
-# Slash Command: Set Timezone
-@bot.tree.command(name="set_timezone", description="Establece tu zona horaria")
-async def slash_set_timezone(interaction: discord.Interaction):
-    view = TimezoneSelectView()
-    await interaction.response.send_message("Selecciona tu zona horaria:", view=view)
-
-# Slash Command: Desuscribir
-@bot.tree.command(name="desuscribir", description="Desuscribe el canal actual")
-async def slash_desuscribir(interaction: discord.Interaction):
-    if interaction.guild.id in subscribed_channels and subscribed_channels[interaction.guild.id] == interaction.channel.id:
-        del subscribed_channels[interaction.guild.id]
-        save_subscribed_channels(subscribed_channels)
-        await interaction.response.send_message(f"El canal {interaction.channel.mention} ha sido desuscrito.")
+@bot.command(name='desuscribir')
+async def unsubscribe_channel(ctx):
+    if ctx.guild.id in subscribed_channels and subscribed_channels[ctx.guild.id] == ctx.channel.id:
+        del subscribed_channels[ctx.guild.id]
+        save_subscribed_channels(subscribed_channels) 
+        await ctx.send(f"El canal {ctx.channel.mention} ha sido desuscrito de las actualizaciones del precio del dólar.")
     else:
-        await interaction.response.send_message(f"El canal {interaction.channel.mention} no está suscrito.")
+        await ctx.send(f"El canal {ctx.channel.mention} no está suscrito a las actualizaciones del precio del dólar.")
+
+
+@bot.command(name='historial')
+async def historial_command(ctx):
+    view = HistoricalView()
+    await ctx.send("Selecciona la temporalidad del historial:", view=view)
+
+@bot.command(name='help')
+async def help_command(ctx):
+    help_text = """
+    **Comandos Disponibles:**
+    `/dbb precio` - Muestra el precio actual de USDT a BOB.
+    `/dbb suscribir` - Suscribe un canal para recibir actualizaciones diarias del precio del dólar.
+    `/dbb desuscribir` - Desuscribe el canal actual de las actualizaciones del precio del dólar.
+    `/dbb historial` - Muestra el historial de cambios del tipo de cambio del dólar. Puedes seleccionar entre ver por hora o por día.
+    `/dbb set_timezone` - Establece tu zona horaria para mostrar los tiempos correctamente mediante una lista desplegable.
+    """
+    await ctx.send(help_text)
